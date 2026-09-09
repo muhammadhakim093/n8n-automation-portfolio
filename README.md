@@ -13,8 +13,10 @@ Workflow yang mengintegrasikan **Google Gemini API** untuk menganalisis pesan ca
 - Google Gemini API (LLM integration)
 - JavaScript (Code node untuk parsing response)
 
+
 **Node flow:**
 
+`Trigger` → `Input pesan` → `HTTP Request ke Gemini API` → `Parse JSON response`
 
 **Kemampuan yang ditunjukkan:**
 - Integrasi LLM API ke dalam automation workflow
