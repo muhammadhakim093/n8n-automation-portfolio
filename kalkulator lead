@@ -1,0 +1,198 @@
+{
+  "name": "kalkulator lead",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "your-webhook-path",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "a5b8661b-c78f-49b9-bdcb-8b3ad11a8919",
+      "name": "Webhook",
+      "webhookId": "60eed2da-fb26-47f7-99a5-1d0f2bd0a247"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "498ac731-cf88-4c0f-af02-393685a46671", "name": "nama_lead", "value": "={{ $json.body.nama_lead }}", "type": "string" },
+            { "id": "77fe2990-44c8-461a-bac8-32f0cb9a94fd", "name": "nomor_wa", "value": "={{ $json.body.nomor_wa }}", "type": "string" },
+            { "id": "129c42a8-f0fd-4b2d-8a9d-196713c20f81", "name": "tipe_pekerjaan", "value": "={{ $json.body.tipe_pekerjaan }}", "type": "string" },
+            { "id": "71dc4140-aa75-43c4-beaa-44ad9f341cf1", "name": "luas_m2", "value": "={{ $json.body.luas_m2 }}", "type": "number" },
+            { "id": "cfe13835-624e-4c7f-bf01-6a714e8270ea", "name": "estimasi_min", "value": "={{ $json.body.estimasi_min }}", "type": "number" },
+            { "id": "d5382b24-f04c-4f25-a9c5-e59b86089536", "name": "estimasi_max", "value": "={{ $json.body.estimasi_max }}", "type": "number" }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [224, 0],
+      "id": "03a3746f-063d-4a30-8bca-58632f5c939f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose", "version": 3 },
+          "conditions": [
+            {
+              "id": "e80466f6-9ceb-47c9-8ea5-0d1e696b366a",
+              "leftValue": "={{ $json.estimasi_min }}",
+              "rightValue": 30000000,
+              "operator": { "type": "number", "operation": "gte" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [448, 0],
+      "id": "6ca504ff-ffdd-4f88-9e79-040190cddd8b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🔔 Lead Baru - Prioritas!  Nama: {{ $json.nama_lead }} No. WA: {{ $json.nomor_wa }} Jenis: {{ $json.tipe_pekerjaan }} Luas: {{ $json.luas_m2 }} m² Estimasi: Rp {{ $json.estimasi_min }} - Rp {{ $json.estimasi_max }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [672, -96],
+      "id": "8fd946b9-4d42-4432-b279-dc1059090c5e",
+      "name": "Send a text message",
+      "webhookId": "27bfd336-0ee6-4842-8aa4-3de4a3c03f8f",
+      "credentials": { "telegramApi": { "id": "yaFqDG0f5OWhP2xh", "name": "Telegram account" } }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Database Lead - [Nama Klien]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp ": "={{ $now }}",
+            "Nama ": "={{ $('If').item.json.nama_lead }}",
+            "No WA ": "={{ $('If').item.json.nomor_wa }}",
+            " Jenis Pekerjaan ": "={{ $('If').item.json.tipe_pekerjaan }}",
+            " Luas (m2) ": "={{ $('If').item.json.luas_m2 }}",
+            " Estimasi Min ": "={{ $('If').item.json.estimasi_min }}",
+            " Estimasi Max ": "={{ $('If').item.json.estimasi_max }}",
+            "Status": "Lead Prioritas"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "Timestamp ", "displayName": "Timestamp ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "Nama ", "displayName": "Nama ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "No WA ", "displayName": "No WA ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": " Jenis Pekerjaan ", "displayName": " Jenis Pekerjaan ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": " Luas (m2) ", "displayName": " Luas (m2) ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": " Estimasi Min ", "displayName": " Estimasi Min ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": " Estimasi Max ", "displayName": " Estimasi Max ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false },
+            { "id": "Status", "displayName": "Status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true, "removed": false }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [896, -96],
+      "id": "1c0a0fad-be46-4e34-845a-cffe1c061d9a",
+      "name": "Append row in sheet",
+      "credentials": { "googleSheetsOAuth2Api": { "id": "ToQrV3QBwXj57UTc", "name": "Google Sheets account" } }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Database Lead - [Nama Klien]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nama ": "={{ $('Edit Fields').item.json.nama_lead }}",
+            "No WA ": "={{ $('Edit Fields').item.json.nomor_wa }}",
+            " Jenis Pekerjaan ": "={{ $('Edit Fields').item.json.tipe_pekerjaan }}",
+            " Luas (m2) ": "={{ $('Edit Fields').item.json.luas_m2 }}",
+            " Estimasi Min ": "={{ $('Edit Fields').item.json.estimasi_min }}",
+            " Estimasi Max ": "={{ $('Edit Fields').item.json.estimasi_max }}",
+            "Status": "Lead Perlu Diedukasi",
+            "Timestamp ": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "Timestamp ", "displayName": "Timestamp ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Nama ", "displayName": "Nama ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "No WA ", "displayName": "No WA ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": " Jenis Pekerjaan ", "displayName": " Jenis Pekerjaan ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": " Luas (m2) ", "displayName": " Luas (m2) ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": " Estimasi Min ", "displayName": " Estimasi Min ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": " Estimasi Max ", "displayName": " Estimasi Max ", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true },
+            { "id": "Status", "displayName": "Status", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [672, 96],
+      "id": "4e609eda-d425-4d81-b9d7-5a94e9101285",
+      "name": "Append row in sheet1",
+      "credentials": { "googleSheetsOAuth2Api": { "id": "ToQrV3QBwXj57UTc", "name": "Google Sheets account" } }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Edit Fields", "type": "main", "index": 0 }]] },
+    "Edit Fields": { "main": [[{ "node": "If", "type": "main", "index": 0 }]] },
+    "If": {
+      "main": [
+        [{ "node": "Send a text message", "type": "main", "index": 0 }],
+        [{ "node": "Append row in sheet1", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send a text message": { "main": [[{ "node": "Append row in sheet", "type": "main", "index": 0 }]] }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1", "binaryMode": "separate" },
+  "versionId": "05fd9c7e-3fdb-4bb7-beb5-644a3b992f43",
+  "meta": { "templateCredsSetupCompleted": true, "instanceId": "5ed218b71e53fa40fa5729a9193b606ecb0fc26b91dbfa5434a6505505a47d86" },
+  "nodeGroups": [],
+  "id": "RouPS1z1y0TXPT9r",
+  "tags": []
+}
