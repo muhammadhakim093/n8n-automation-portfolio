@@ -1,0 +1,145 @@
+{
+  "name": "LAPORAN MINGGUAN CV BINTANG ALTA WIJAYA",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cab0a138-ad83-4fcf-b5d0-0e319a0ad059",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Database Lead - [Nama Klien]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "689dff3e-6c8f-4bf4-9d8d-9725669f20dc",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ToQrV3QBwXj57UTc",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date();\nconst oneWeekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);\n\n// Helper: ambil value field tanpa peduli spasi di nama kolom\nfunction getField(json, fieldName) {\n  const key = Object.keys(json).find(k => k.trim() === fieldName);\n  return key ? json[key] : undefined;\n}\n\nconst leadsMingguIni = items.filter(item => {\n  const tanggalLead = new Date(getField(item.json, 'Timestamp'));\n  return tanggalLead >= oneWeekAgo;\n});\n\nconst totalLead = leadsMingguIni.length;\nconst leadPrioritas = leadsMingguIni.filter(i => getField(i.json, 'Status') === 'Lead Prioritas').length;\nconst totalEstimasi = leadsMingguIni.reduce((sum, i) => sum + Number(getField(i.json, 'Estimasi Min') || 0), 0);\n\nreturn [{\n  json: {\n    totalLead,\n    leadPrioritas,\n    leadEdukasi: totalLead - leadPrioritas,\n    totalEstimasi\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "2455cda3-e896-4f98-935d-d809e6660dee",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=📊 Laporan Mingguan - CV Bintang Alta Wijaya  Total lead minggu ini: {{ $json.totalLead }} Lead Prioritas: {{ $json.leadPrioritas }} Lead Perlu Diedukasi: {{ $json.leadEdukasi }} Estimasi total nilai proyek: Rp {{ $json.totalEstimasi.toLocaleString('id-ID') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "122c78de-f8f2-4eb5-bbe8-40b20985ce14",
+      "name": "Send a text message",
+      "webhookId": "7ce27b16-77ce-491f-b130-7eb6f6dac1c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "yaFqDG0f5OWhP2xh",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b82a411f-e36c-4068-858d-0da518e1c76b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5ed218b71e53fa40fa5729a9193b606ecb0fc26b91dbfa5434a6505505a47d86"
+  },
+  "nodeGroups": [],
+  "id": "LeBv5xjcsHK7ulIq",
+  "tags": []
+}
