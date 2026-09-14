@@ -33,5 +33,34 @@ Workflow yang mengintegrasikan **Google Gemini API** untuk menganalisis pesan ca
 | Informal + typo | "mnt tnya biaya gazebo urgent bgt minggu depan" | ✅ tinggi (tetap akurat meski typo) |
 
 ---
+## 2. Laporan Mingguan Otomatis
 
+Workflow terjadwal yang membaca data lead dari Google Sheets setiap minggu dan mengirim ringkasan performa langsung ke Telegram — tanpa perlu membuka spreadsheet secara manual.
+
+**Use case:** Pemilik bisnis (CV Bintang Alta Wijaya) mendapat gambaran cepat performa lead mingguan tanpa harus cek data satu per satu.
+
+**Tech stack:**
+- n8n (Schedule Trigger + Google Sheets integration)
+- JavaScript (Code node untuk agregasi data)
+- Telegram Bot API (notifikasi)
+
+**Node flow:**
+
+`Schedule Trigger (tiap Senin 08:00)` → `Baca data Google Sheets` → `Agregasi & hitung metrik` → `Kirim ringkasan ke Telegram`
+
+**Kemampuan yang ditunjukkan:**
+- Time-based automation (scheduled trigger), bukan hanya event-driven (webhook)
+- Data aggregation dan kalkulasi menggunakan JavaScript (Code node)
+- Debugging nama field dengan whitespace tidak konsisten dari sumber data eksternal
+- Integrasi multi-platform (Google Sheets → n8n → Telegram)
+
+**Output contoh:**
+```
+📊 Laporan Mingguan - CV Bintang Alta Wijaya
+
+Total lead minggu ini: 3
+Lead Prioritas: 3
+Lead Perlu Diedukasi: 0
+Estimasi total nilai proyek: Rp 440.000.000
+```
 *Repo ini akan terus ditambah dengan workflow lain seiring proses belajar.*
