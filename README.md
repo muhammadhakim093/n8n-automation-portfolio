@@ -63,4 +63,28 @@ Lead Prioritas: 3
 Lead Perlu Diedukasi: 0
 Estimasi total nilai proyek: Rp 440.000.000
 ```
+## 3. Lead Capture & Budget-Based Routing System
+
+Workflow inti yang menjadi fondasi seluruh sistem — menangkap lead dari kalkulator web, memfilter berdasarkan budget, dan merutekan secara otomatis ke jalur notifikasi yang berbeda.
+
+**Use case:** Kalkulator estimasi biaya di website klien mengirim data lead via webhook. Lead dengan estimasi di atas threshold budget tertentu langsung dikirim ke Telegram + Google Sheets sebagai prioritas; lead di bawah threshold tetap tercatat di Sheets untuk follow-up edukasi.
+
+**Tech stack:**
+- n8n (Webhook trigger + conditional branching)
+- Telegram Bot API (notifikasi real-time)
+- Google Sheets API (penyimpanan data terstruktur)
+
+**Node flow:**
+
+`Webhook (POST dari kalkulator)` → `Parsing data lead` → `IF (cek threshold budget)` → cabang `Prioritas`: kirim Telegram + simpan Sheets, cabang `Edukasi`: simpan Sheets saja
+
+**Kemampuan yang ditunjukkan:**
+- Menerima dan memproses data real-time via Webhook (bukan hanya scheduled/manual trigger)
+- Conditional branching (IF node) untuk merutekan data berdasarkan kriteria bisnis
+- Integrasi multi-cabang — satu trigger menghasilkan dua jalur eksekusi berbeda
+- Live di production, menangani lead nyata sejak sistem diluncurkan
+
+---
+
+
 *Repo ini akan terus ditambah dengan workflow lain seiring proses belajar.*
