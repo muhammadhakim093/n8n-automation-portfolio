@@ -85,6 +85,31 @@ Workflow inti yang menjadi fondasi seluruh sistem — menangkap lead dari kalkul
 - Live di production, menangani lead nyata sejak sistem diluncurkan
 
 ---
+## 4. Modular Sub-Workflow Design
 
+Refactor dari workflow AI Lead Qualification menjadi sub-workflow yang dapat dipanggil (reusable) dari workflow manapun — menerapkan prinsip modular design agar logic AI tidak perlu diduplikasi di setiap tempat yang membutuhkannya.
+
+**Use case:** Alih-alih menyalin ulang node-node AI qualification setiap kali dibutuhkan di workflow berbeda, logic tersebut diisolasi menjadi satu sub-workflow yang bisa dipanggil dengan parameter input. Jika prompt AI perlu diperbarui, cukup diedit di satu tempat — semua workflow pemanggil otomatis mendapat versi terbaru.
+
+**Tech stack:**
+- n8n (Execute Workflow Trigger + Execute Sub-workflow node)
+- Google Gemini API
+
+**File terkait:**
+- `sub-workflow-ai-qualification.json` — sub-workflow yang menerima parameter `pesan_lead` dan mengembalikan hasil klasifikasi
+- `test-caller-workflow.json` — contoh workflow pemanggil (caller) untuk testing
+
+**Node flow:**
+
+Sub-workflow: `When Executed by Another Workflow (menerima parameter pesan_lead)` → `HTTP Request ke Gemini API` → `Parse JSON response`
+
+Caller: `Manual Trigger` → `Set data test` → `Execute Sub-workflow (memanggil & memetakan parameter)`
+
+**Kemampuan yang ditunjukkan:**
+- Modular workflow architecture — memisahkan logic reusable dari implementasi spesifik
+- Parameter passing antar workflow (Workflow Input Schema)
+- Prinsip DRY (Don't Repeat Yourself) diterapkan dalam konteks low-code automation
+
+---
 
 *Repo ini akan terus ditambah dengan workflow lain seiring proses belajar.*
